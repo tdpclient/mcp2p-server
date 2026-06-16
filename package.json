@@ -1,0 +1,7 @@
+{
+  "name": "mcp2p-server",
+  "main": "api/index.js",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
