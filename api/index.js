@@ -1,18 +1,26 @@
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+// CORS
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") return res.sendStatus(200);
+    next();
+});
+
 const rooms = new Map();
 
-export default function handler(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    
-    if (req.method === "OPTIONS") {
-        return res.status(200).end();
-    }
-    
-    if (req.method === "GET") {
-        return res.status(200).json({ status: "ok" });
-    }
-    
+// 健康检查
+app.get("/", (req, res) => {
+    res.json({ status: "ok" });
+});
+
+// 创建房间
+app.post("/", (req, res) => {
     try {
         const { action, code, ip, port, name } = req.body;
         
@@ -31,7 +39,7 @@ export default function handler(req, res) {
                     expire: Date.now() + 172800000
                 });
                 
-                return res.status(200).json({ code: roomCode });
+                return res.json({ code: roomCode });
             }
             
             case "join": {
@@ -40,13 +48,16 @@ export default function handler(req, res) {
                     rooms.delete(code);
                     return res.status(404).json({ err: "房间不存在" });
                 }
-                return res.status(200).json(room);
+                return res.json(room);
             }
             
             default:
                 return res.status(400).json({ err: "未知操作" });
         }
     } catch (e) {
-        return res.status(500).json({ err: e.message });
+        res.status(500).json({ err: e.message });
     }
-}
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Server running on port " + PORT));
