@@ -12,8 +12,6 @@ export default async function handler(req, res) {
     const { code } = req.body;
     const roomKey = `room:${code}`;
     await kv.del(roomKey);
-    await kv.srem("online:hosts", code);
-    await kv.del(`active:${code}`);
     return res.status(200).send('ok');
   } catch (err) {
     console.error('删除房间失败', err);
