@@ -17,12 +17,10 @@ export default async function handler(req, res) {
       hostName: host,
       lastActive: Date.now()
     });
-    // 房间2小时兜底过期
+    // 房间兜底2小时过期
     await kv.set(roomKey, roomData, { ex: 7200 });
-
-    // 把在线房主code存入在线集合，用于统计
+    // 加入在线房主集合
     await kv.sadd("online:hosts", code);
-    // 记录该房主最后活跃时间
     await kv.set(`active:${code}`, Date.now(), { ex: 7200 });
 
     return res.status(200).send('ok');
