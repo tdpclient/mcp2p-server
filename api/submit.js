@@ -19,10 +19,7 @@ export default async function handler(req, res) {
     });
     // 房间兜底2小时过期
     await kv.set(roomKey, roomData, { ex: 7200 });
-    // 加入在线房主集合
-    await kv.sadd("online:hosts", code);
-    await kv.set(`active:${code}`, Date.now(), { ex: 7200 });
-
+    
     return res.status(200).send('ok');
   } catch (err) {
     console.error('写入房间失败', err);
