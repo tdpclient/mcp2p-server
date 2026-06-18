@@ -15,7 +15,6 @@ export default async function handler(req, res) {
       return res.send('error');
     }
 
-    // 强制序列化JSON字符串再存入Redis，杜绝 [object Object]
     const storeData = JSON.stringify({
       code,
       ip,
