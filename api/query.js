@@ -19,13 +19,19 @@ export default async function handler(req, res) {
     }
 
     let data;
-    try {
-      data = JSON.parse(raw);
-      console.log('[QUERY DEBUG] 解析完成 data=', data);
-    } catch (parseErr) {
-      console.error('[QUERY 解析失败] code=' + code, parseErr);
-      await kv.del(code);
-      return res.send('error');
+    // 修复：如果已经是对象，直接赋值；只有字符串才parse
+    if (typeof raw === "string") {
+      try {
+        data = JSON.parse(raw);
+        console.log('[QUERY DEBUG] 字符串解析完成 data=', data);
+      } catch (parseErr) {
+        console.error('[QUERY 解析失败] code=' + code, parseErr);
+        await kv.del(code);
+        return res.send('error');
+      }
+    } else {
+      data = raw;
+      console.log('[QUERY DEBUG] 已为对象，无需解析 data=', data);
     }
 
     if (!data.ip || typeof data.port !== "number") {
